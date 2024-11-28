@@ -1,0 +1,46 @@
+{%extends 'base.html'%} {% load crispy_forms_tags %} {%block content%}
+<section class="py-5">
+  <h1>Album Table</h1>
+
+  <div class="my-4">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#ID</th>
+          <th scope="col">Musician Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Album Rating</th>
+          <th scope="col">Instrument Type</th>
+          <th scope="col">Album Name</th>
+          <th scope="col">Release Date</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for album in albums %}
+        <tr>
+          <th scope="row">{{ album.id }}</th>
+          <td>
+            <a
+              class="text-black text-decoration-none fw-semibold"
+              href=" {% url 'edit_musician' album.musician.id %} "
+            >
+              {{ album.musician }}
+            </a>
+          </td>
+          <td>{{ album.musician.email }}</td>
+          <td>{{ album.rating }}</td>
+          <td>{{ album.musician.instrument_type }}</td>
+          <td>{{ album.name }}</td>
+          <td>{{ album.release_date }}</td>
+          <td>
+            <a href="#" class="btn btn-sm btn-warning">Edit</a>
+            <a href="#" class="btn btn-sm btn-danger ms-2">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{%endblock%}
