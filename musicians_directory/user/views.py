@@ -1,24 +1,33 @@
 from django.shortcuts import render, redirect
-from .forms import RegistrationForm, ChangeUserForm
+from .forms import RegistrationForm
 from django.contrib import messages
 from django.utils.decorators import method_decorator
+from django.views.generic import CreateView
 from django.contrib.auth.views import LoginView, TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib.auth.models import User
 
 
 # Create your views here.
-def sign_up(request):
-    if request.method == "POST":
-        register_form = RegistrationForm(request.POST)
-        if register_form.is_valid():
-            register_form.save()
-            messages.success(request, "User Registered Succesfully")
-            return redirect("login_page")
-    else:
-        register_form = RegistrationForm()
-    return render(request, "sign_up.html", {"form": register_form, "type": "Register"})
+class UserRegister(CreateView):
+    model = User
+    form_class = RegistrationForm
+    template_name = "sign_up.html"
+    success_url = reverse_lazy("login_page")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Account created successfully!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["type"] = "Register"
+        return context
 
 
 class UserLoginView(LoginView):
@@ -54,16 +63,3 @@ class ProfileView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["user"] = self.request.user
         return context
-
-
-@login_required
-def edit_profile(request):
-    if request.method == "POST":
-        profile_form = ChangeUserForm(request.POST, instance=request.user)
-        if profile_form.is_valid():
-            profile_form.save()
-            messages.success(request, "Profile updated successfully")
-            return redirect("profile_page")
-    else:
-        profile_form = ChangeUserForm(instance=request.user)
-    return render(request, "update_profile.html", {"form": profile_form})
