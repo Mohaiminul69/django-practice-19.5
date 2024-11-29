@@ -3,10 +3,9 @@ from .forms import RegistrationForm
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView
-from django.contrib.auth.views import LoginView, TemplateView
+from django.contrib.auth.views import LoginView, LogoutView, TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
 from django.contrib.auth.models import User
 
 
@@ -50,9 +49,12 @@ class UserLoginView(LoginView):
         return context
 
 
-def user_logout(request):
-    logout(request)
-    return redirect("login_page")
+class UserLogoutView(LogoutView):
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy("login_page")
 
 
 @method_decorator(login_required, name="dispatch")
